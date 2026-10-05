@@ -54,6 +54,16 @@ function CrearGasto(descripcion, valor, fecha, ...etiquetas) {
             this.valor = nuevoValor;
         }
     };
+
+    this.mostrarGastoCompleto = function () {
+        let texto = "Gasto correspondiente a " + this.descripcion + " con valor " + this.valor + " €";
+        texto += "\n" + "Fecha: " + new Date(this.fecha).toLocaleString();
+        texto += "\n" + "Etiquetas:";
+        for (let etiqueta of this.etiquetas) {
+            texto += "\n" + " - " + etiqueta;
+        }
+        return texto;
+    };
 }
 
 function listarGastos() {
