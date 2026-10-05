@@ -70,6 +70,10 @@ function CrearGasto(descripcion, valor, fecha, ...etiquetas) {
             this.fecha = Date.parse(nuevaFecha);
         }
     };
+
+    this.borrarEtiquetas = function (...etiquetasBorrar) {
+        this.etiquetas = this.etiquetas.filter(etiqueta => !etiquetasBorrar.includes(etiqueta));
+    };
 }
 
 function listarGastos() {
