@@ -60,7 +60,10 @@ function listarGastos() {
     return gastos;
 }
 
-function anyadirGasto() {
+function anyadirGasto(gasto) {
+    gasto.id = idGasto;
+    idGasto++;
+    gastos.push(gasto);
 }
 
 function borrarGasto() {
