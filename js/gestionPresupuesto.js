@@ -19,6 +19,7 @@ function mostrarPresupuesto() {
 
 function CrearGasto(descripcion, valor, fecha, ...etiquetas) {
     this.descripcion = descripcion;
+    this.fecha = fecha;
     this.valor = (typeof valor === "number" && valor >= 0) ? valor : 0;
 
     if (fecha && !isNaN(Date.parse(fecha))) {
