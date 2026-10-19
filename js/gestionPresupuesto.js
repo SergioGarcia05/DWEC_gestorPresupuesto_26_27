@@ -84,9 +84,11 @@ function CrearGasto(descripcion, valor, fecha, ...etiquetas) {
         let dia = String(fechaObj.getDate()).padStart(2, "0");
         if (periodo === "dia") {
             return anyo + "-" + mes + "-" + dia;
-        } else if (periodo === "mes") {
+        }
+        else if (periodo === "mes") {
             return anyo + "-" + mes;
-        } else if (periodo === "anyo") {
+        }
+        else if (periodo === "anyo") {
             return String(anyo);
         }
     };
@@ -119,27 +121,27 @@ function calcularBalance() {
 
 function filtrarGastos({ fechaDesde, fechaHasta, valorMinimo, valorMaximo, descripcionContiene, etiquetasTiene } = {}) {
     return gastos.filter(function (gasto) {
-        // Filtrar por fecha mínima
+        // Filtrar por fecha minima
         if (fechaDesde !== undefined && gasto.fecha < Date.parse(fechaDesde)) {
             return false;
         }
-        // Filtrar por fecha máxima
+        // Filtrar por fecha maxima
         if (fechaHasta !== undefined && gasto.fecha > Date.parse(fechaHasta)) {
             return false;
         }
-        // Filtrar por valor mínimo
+        // Filtrar por valor minimo
         if (valorMinimo !== undefined && gasto.valor < valorMinimo) {
             return false;
         }
-        // Filtrar por valor máximo
+        // Filtrar por valor maximo
         if (valorMaximo !== undefined && gasto.valor > valorMaximo) {
             return false;
         }
-        // Filtrar por descripción (sin distinguir mayúsculas/minúsculas)
+        // Filtrar por descricpion sin distinguir mayus/minus
         if (descripcionContiene !== undefined && !gasto.descripcion.toLowerCase().includes(descripcionContiene.toLowerCase())) {
             return false;
         }
-        // Filtrar por etiquetas (sin distinguir mayúsculas/minúsculas)
+        // Filtrar por etiquetas sin distinguir mayus/minus
         if (etiquetasTiene !== undefined) {
             let tieneAlguna = etiquetasTiene.some(function (etiquetaBuscada) {
                 return gasto.etiquetas.some(function (etiquetaGasto) {
@@ -154,7 +156,32 @@ function filtrarGastos({ fechaDesde, fechaHasta, valorMinimo, valorMaximo, descr
     });
 }
 
-function agruparGastos() {
+function agruparGastos(periodo = "mes", etiquetas, fechaDesde, fechaHasta) {
+    // Construir el objeto de filtro para filtrarGastos
+    let filtro = {};
+
+    if (fechaDesde !== undefined) {
+        filtro.fechaDesde = fechaDesde;
+    }
+    if (fechaHasta !== undefined) {
+        filtro.fechaHasta = fechaHasta;
+    }
+    if (etiquetas !== undefined && etiquetas.length > 0) {
+        filtro.etiquetasTiene = etiquetas;
+    }
+
+    // Obtener los gastos filtrados
+    let gastosFiltrados = filtrarGastos(filtro);
+
+    // Agrupar usando reduce
+    return gastosFiltrados.reduce(function (acc, gasto) {
+        let clave = gasto.obtenerPeriodoAgrupacion(periodo);
+        if (acc[clave] === undefined) {
+            acc[clave] = 0;
+        }
+        acc[clave] += gasto.valor;
+        return acc;
+    }, {});
 }
 
 // NO MODIFICAR A PARTIR DE AQUÍ: exportación de funciones y objetos creados para poder ejecutar los tests.
