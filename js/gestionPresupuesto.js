@@ -3,7 +3,7 @@ let presupuesto = 0;
 let gastos = [];
 let idGasto = 0;
 
- function actualizarPresupuesto(valor) {
+function actualizarPresupuesto(valor) {
     if (typeof valor === "number" && valor >= 0) {
         presupuesto = valor;
         return presupuesto;
@@ -13,15 +13,18 @@ let idGasto = 0;
     }
 }
 
- function mostrarPresupuesto() {
+function mostrarPresupuesto() {
     return `Tu presupuesto actual es de ${presupuesto} €`;
 }
 
-// Constructor original
- function CrearGasto(descripcion, valor, fecha, ...etiquetas) {
+// Constructor corregido para almacenar la fecha como timestamp (número)
+function CrearGasto(descripcion, valor, fecha, ...etiquetas) {
     this.descripcion = descripcion;
     this.valor = (typeof valor === "number" && valor >= 0) ? valor : 0;
-    this.fecha = fecha || new Date().toISOString().split('T')[0];
+    
+    // Parsear la fecha a timestamp o usar la fecha actual si no es válida/no se proporciona
+    let parsedFecha = fecha ? Date.parse(fecha) : NaN;
+    this.fecha = !isNaN(parsedFecha) ? parsedFecha : Date.now();
 
     this.etiquetas = [];
 
@@ -52,8 +55,9 @@ let idGasto = 0;
     };
 
     this.mostrarGastoCompleto = function () {
+        let fechaFormateada = typeof this.fecha === 'number' ? new Date(this.fecha).toLocaleString() : this.fecha;
         let texto = "Gasto correspondiente a " + this.descripcion + " con valor " + this.valor + " €.";
-        texto += "\n" + "Fecha: " + this.fecha;
+        texto += "\n" + "Fecha: " + fechaFormateada;
         texto += "\n" + "Etiquetas:";
         for (let etiqueta of this.etiquetas) {
             texto += "\n" + "- " + etiqueta;
@@ -63,8 +67,9 @@ let idGasto = 0;
     };
 
     this.actualizarFecha = function (nuevaFecha) {
-        if (nuevaFecha) {
-            this.fecha = nuevaFecha;
+        let parsed = Date.parse(nuevaFecha);
+        if (!isNaN(parsed)) {
+            this.fecha = parsed;
         }
     };
 
@@ -88,37 +93,37 @@ let idGasto = 0;
     };
 }
 
-// Función auxiliar en minúscula que llama al constructor (requerida por generarDatosEstaticos.js)
- function crearGasto(descripcion, valor, fecha, ...etiquetas) {
+// Función auxiliar en minúscula que llama al constructor
+function crearGasto(descripcion, valor, fecha, ...etiquetas) {
     return new CrearGasto(descripcion, valor, fecha, ...etiquetas);
 }
 
- function listarGastos() {
+function listarGastos() {
     return gastos;
 }
 
- function anyadirGasto(gasto) {
+function anyadirGasto(gasto) {
     gasto.id = idGasto;
     idGasto++;
     gastos.push(gasto);
 }
 
- function borrarGasto(id) {
+function borrarGasto(id) {
     let indice = gastos.findIndex(gasto => gasto.id === id);
     if (indice !== -1) {
         gastos.splice(indice, 1);
     }
 }
 
- function calcularTotalGastos() {
+function calcularTotalGastos() {
     return gastos.reduce((total, gasto) => total + gasto.valor, 0);
 }
 
- function calcularBalance() {
+function calcularBalance() {
     return presupuesto - calcularTotalGastos();
 }
 
- function filtrarGastos(filtro = {}) {
+function filtrarGastos(filtro = {}) {
     return gastos.filter(function (gasto) {
         let fDesde = filtro.fechaDesde || filtro.fechaInicio;
         let fHasta = filtro.fechaHasta || filtro.fechaFin;
@@ -128,10 +133,13 @@ let idGasto = 0;
         let etqs = filtro.etiquetas || filtro.etiquetasTiene;
         let etqUnica = filtro.etiqueta;
 
-        if (fDesde !== undefined && gasto.fecha < fDesde) {
+        // Convertir la fecha del gasto a formato YYYY-MM-DD para comparar de forma segura con los filtros
+        let gastoFechaStr = typeof gasto.fecha === 'number' ? new Date(gasto.fecha).toISOString().split('T')[0] : gasto.fecha;
+
+        if (fDesde !== undefined && gastoFechaStr < fDesde) {
             return false;
         }
-        if (fHasta !== undefined && gasto.fecha > fHasta) {
+        if (fHasta !== undefined && gastoFechaStr > fHasta) {
             return false;
         }
         if (vMin !== undefined && gasto.valor < vMin) {
@@ -162,7 +170,7 @@ let idGasto = 0;
     });
 }
 
- function agruparGastos(periodo = "mes", etiquetas, fechaDesde, fechaHasta) {
+function agruparGastos(periodo = "mes", etiquetas, fechaDesde, fechaHasta) {
     let filtro = {};
     if (fechaDesde !== undefined) {
         filtro.fechaDesde = fechaDesde;
@@ -185,7 +193,8 @@ let idGasto = 0;
         return acc;
     }, {});
 }
-export{
+
+export {
     actualizarPresupuesto,
     mostrarPresupuesto,
     CrearGasto,
@@ -197,4 +206,4 @@ export{
     borrarGasto,
     anyadirGasto,
     listarGastos
-}
+};
