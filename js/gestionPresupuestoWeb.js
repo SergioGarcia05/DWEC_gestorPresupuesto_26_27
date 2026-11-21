@@ -28,6 +28,21 @@ export function repintar() {
     mostrarGastoWeb('listado-gastos-completo', gasto);
   }
 }
+export function actualizarPresupuestoWeb() {
+  const entrada = prompt('Introduce el nuevo presupuesto:');
+  if (entrada === null) return;
+
+  const nuevoPresupuesto = Number(entrada);
+  if (!Number.isNaN(nuevoPresupuesto)) {
+    gesPres.actualizarPresupuesto(nuevoPresupuesto);
+    repintar();
+  }
+}
+
+const btnActualizarPresupuesto = document.getElementById('actualizarpresupuesto');
+if (btnActualizarPresupuesto) {
+  btnActualizarPresupuesto.addEventListener('click', actualizarPresupuestoWeb);
+}
 
 export function mostrarGastoWeb(idElemento, gasto) {
     const contenedor = document.getElementById(idElemento);
