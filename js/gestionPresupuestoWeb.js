@@ -6,7 +6,28 @@ export function mostrarDatoEnId(idElemento, valor) {
         elemento.textContent = valor;
     }
 }
+export function repintar() {
+  // Mostrar el presupuesto en div#presupuesto
+  mostrarDatoEnId('presupuesto', gesPres.mostrarPresupuesto());
 
+  // Mostrar los gastos totales en div#gastos-totales
+  mostrarDatoEnId('gastos-totales', gesPres.calcularTotalGastos());
+
+  // Mostrar el balance total en div#balance-total
+  mostrarDatoEnId('balance-total', gesPres.calcularBalance());
+
+  // Borrar el contenido de div#listado-gastos-completo para no duplicar
+  const listadoCompleto = document.getElementById('listado-gastos-completo');
+  if (listadoCompleto) {
+    listadoCompleto.innerHTML = '';
+  }
+
+  // Mostrar el listado completo de gastos en div#listado-gastos-completo
+  const gastos = gesPres.listarGastos();
+  for (const gasto of gastos) {
+    mostrarGastoWeb('listado-gastos-completo', gasto);
+  }
+}
 
 export function mostrarGastoWeb(idElemento, gasto) {
     const contenedor = document.getElementById(idElemento);
