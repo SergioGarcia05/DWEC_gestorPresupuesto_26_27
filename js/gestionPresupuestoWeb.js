@@ -91,6 +91,19 @@ export function EditarHandle() {
     repintar();
   };
 }
+export function BorrarHandle() {
+  this.handleEvent = function () {
+    gesPres.borrarGasto(this.gasto.id);
+    repintar();
+  };
+}
+
+export function BorrarEtiquetasHandle() {
+  this.handleEvent = function () {
+    this.gasto.borrarEtiquetas(this.etiqueta);
+    repintar();
+  };
+}
 export function mostrarGastoWeb(idElemento, gasto) {
     const contenedor = document.getElementById(idElemento);
     if (!contenedor) return;
@@ -115,25 +128,44 @@ export function mostrarGastoWeb(idElemento, gasto) {
 
     const divEtiquetas = document.createElement("div");
     divEtiquetas.className = "gasto-etiquetas";
-    
+
     if (gasto.etiquetas && Array.isArray(gasto.etiquetas)) {
         for (const etiqueta of gasto.etiquetas) {
             const spanEtiqueta = document.createElement("span");
             spanEtiqueta.className = "gasto-etiquetas-etiqueta";
             spanEtiqueta.textContent = etiqueta;
+
+            const borrarEtiquetaHandler = new BorrarEtiquetasHandle();
+            borrarEtiquetaHandler.gasto = gasto;
+            borrarEtiquetaHandler.etiqueta = etiqueta;
+            spanEtiqueta.addEventListener('click', borrarEtiquetaHandler);
+
             divEtiquetas.appendChild(spanEtiqueta);
         }
     }
-    const btnEditar = document.createElement('button');
-      btnEditar.type = 'button';
-      btnEditar.className = 'gasto-editar';
-    btnEditar.textContent = 'Editar';
+    divGasto.appendChild(divEtiquetas);
+
+    const btnEditar = document.createElement("button");
+    btnEditar.type = "button";
+    btnEditar.className = "gasto-editar";
+    btnEditar.textContent = "Editar";
 
     const editarHandler = new EditarHandle();
-      editarHandler.gasto = gasto;
-      btnEditar.addEventListener('click', editarHandler);
-      divGasto.appendChild(divEtiquetas);
-      contenedor.appendChild(divGasto);
+    editarHandler.gasto = gasto;
+    btnEditar.addEventListener('click', editarHandler);
+    divGasto.appendChild(btnEditar);
+
+    const btnBorrar = document.createElement("button");
+    btnBorrar.type = "button";
+    btnBorrar.className = "gasto-borrar";
+    btnBorrar.textContent = "Borrar";
+
+    const borrarHandler = new BorrarHandle();
+    borrarHandler.gasto = gasto;
+    btnBorrar.addEventListener('click', borrarHandler);
+    divGasto.appendChild(btnBorrar);
+
+    contenedor.appendChild(divGasto);
 }
 
 export function mostrarGastosAgrupadosWeb(idElemento, agrup, periodo) {
