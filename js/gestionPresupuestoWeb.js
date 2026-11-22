@@ -44,6 +44,27 @@ if (btnActualizarPresupuesto) {
   btnActualizarPresupuesto.addEventListener('click', actualizarPresupuestoWeb);
 }
 
+export function nuevoGastoWeb() {
+  const descripcion = prompt('Introduce la descripción del gasto:') ?? '';
+  const valorTexto = prompt('Introduce el valor del gasto:') ?? '0';
+  const fecha = prompt('Introduce la fecha del gasto (yyyy-mm-dd):') ?? '';
+  const etiquetasTexto = prompt('Introduce las etiquetas separadas por comas (etiqueta1,etiqueta2,etiqueta3):') ?? '';
+
+  const valor = Number(valorTexto);
+  const etiquetas = etiquetasTexto.trim() !== ''
+    ? etiquetasTexto.split(',').map(et => et.trim()).filter(et => et !== '')
+    : [];
+
+  const gasto = new gesPres.CrearGasto(descripcion, valor, fecha, ...etiquetas);
+  gesPres.anyadirGasto(gasto);
+  repintar();
+}
+
+const btnAnyadirGasto = document.getElementById('anyadirgasto');
+if (btnAnyadirGasto) {
+  btnAnyadirGasto.addEventListener('click', nuevoGastoWeb);
+}
+
 export function mostrarGastoWeb(idElemento, gasto) {
     const contenedor = document.getElementById(idElemento);
     if (!contenedor) return;
