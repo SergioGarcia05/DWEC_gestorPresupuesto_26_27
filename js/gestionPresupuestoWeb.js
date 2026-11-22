@@ -65,6 +65,32 @@ if (btnAnyadirGasto) {
   btnAnyadirGasto.addEventListener('click', nuevoGastoWeb);
 }
 
+export function EditarHandle() {
+  this.handleEvent = function () {
+    const nuevaDescripcion = prompt('Introduce la nueva descripción:', this.gasto.descripcion) ?? this.gasto.descripcion;
+    const nuevoValorTexto = prompt('Introduce el nuevo valor:', this.gasto.valor) ?? String(this.gasto.valor);
+    const fechaPorDefecto = new Date(this.gasto.fecha).toISOString().slice(0, 10);
+    const nuevaFecha = prompt('Introduce la nueva fecha (yyyy-mm-dd):', fechaPorDefecto) ?? fechaPorDefecto;
+    const etiquetasPorDefecto = Array.isArray(this.gasto.etiquetas) ? this.gasto.etiquetas.join(',') : '';
+    const nuevasEtiquetasTexto = prompt('Introduce las etiquetas separadas por comas:', etiquetasPorDefecto) ?? etiquetasPorDefecto;
+
+    const nuevoValor = Number(nuevoValorTexto);
+    const nuevasEtiquetas = nuevasEtiquetasTexto.trim() !== ''
+      ? nuevasEtiquetasTexto.split(',').map(et => et.trim()).filter(et => et !== '')
+      : [];
+
+    this.gasto.actualizarDescripcion(nuevaDescripcion);
+    if (!Number.isNaN(nuevoValor)) {
+      this.gasto.actualizarValor(nuevoValor);
+    }
+    this.gasto.actualizarFecha(nuevaFecha);
+    if (typeof this.gasto.anyadirEtiquetas === 'function') {
+      this.gasto.anyadirEtiquetas(...nuevasEtiquetas);
+    }
+
+    repintar();
+  };
+}
 export function mostrarGastoWeb(idElemento, gasto) {
     const contenedor = document.getElementById(idElemento);
     if (!contenedor) return;
@@ -98,8 +124,16 @@ export function mostrarGastoWeb(idElemento, gasto) {
             divEtiquetas.appendChild(spanEtiqueta);
         }
     }
-    divGasto.appendChild(divEtiquetas);
-    contenedor.appendChild(divGasto);
+    const btnEditar = document.createElement('button');
+      btnEditar.type = 'button';
+      btnEditar.className = 'gasto-editar';
+    btnEditar.textContent = 'Editar';
+
+    const editarHandler = new EditarHandle();
+      editarHandler.gasto = gasto;
+      btnEditar.addEventListener('click', editarHandler);
+      divGasto.appendChild(divEtiquetas);
+      contenedor.appendChild(divGasto);
 }
 
 export function mostrarGastosAgrupadosWeb(idElemento, agrup, periodo) {
